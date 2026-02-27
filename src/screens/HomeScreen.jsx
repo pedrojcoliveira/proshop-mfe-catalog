@@ -1,4 +1,4 @@
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useGetProductsQuery } from '../slices/productsApiSlice';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ const HomeScreen = () => {
   });
 
   return (
-    <>
+    <Container>
       {!keyword ? (
         <ProductCarousel />
       ) : (
@@ -50,7 +50,7 @@ const HomeScreen = () => {
           />
         </>
       )}
-    </>
+    </Container>
   );
 };
 

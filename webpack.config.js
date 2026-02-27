@@ -54,6 +54,7 @@ module.exports = {
         "react-router-dom": { singleton: true, requiredVersion: false },
         "react-redux": { singleton: true, requiredVersion: false },
         "@reduxjs/toolkit": { singleton: true, requiredVersion: false },
+        "react-helmet-async": { singleton: true, requiredVersion: false },
       },
     }),
     new HtmlWebpackPlugin({
