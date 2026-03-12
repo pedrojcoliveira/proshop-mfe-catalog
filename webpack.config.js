@@ -45,8 +45,8 @@ module.exports = {
       name: "mfeCatalog",
       filename: "remoteEntry.js",
       exposes: {
-        "./HomeScreen": "./src/remote/HomeScreenRemote.jsx",
-        "./ProductScreen": "./src/remote/ProductScreenRemote.jsx",
+        "./HomeScreen": "./src/HomeCatalogApp.js",
+       // "./ProductScreen": "./src/remote/ProductScreenRemote.jsx",
       },
       shared: {
         react: { singleton: true, requiredVersion: false },
