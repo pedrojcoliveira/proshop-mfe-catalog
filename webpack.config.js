@@ -3,7 +3,7 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 
 module.exports = {
   entry: "./src/index.js",
-  devServer: { 
+  devServer: {
     port: 4203,
     historyApiFallback: true,
     headers: { "Access-Control-Allow-Origin": "*" },
@@ -46,7 +46,9 @@ module.exports = {
       filename: "remoteEntry.js",
       exposes: {
         "./HomeScreen": "./src/HomeCatalogApp.js",
-       // "./ProductScreen": "./src/remote/ProductScreenRemote.jsx",
+      },
+      remotes: {
+        mfeWishlist: "mfeWishlist@http://localhost:4206/remoteEntry.js",
       },
       shared: {
         react: { singleton: true, requiredVersion: false },
