@@ -7,6 +7,10 @@ module.exports = {
     port: 4203,
     historyApiFallback: true,
     headers: { "Access-Control-Allow-Origin": "*" },
+    proxy: {
+      '/api': { target: 'http://localhost:5000', changeOrigin: true },
+      '/uploads': { target: 'http://localhost:5000', changeOrigin: true },
+    },
   },
   output: { 
     publicPath: "http://localhost:4203/",

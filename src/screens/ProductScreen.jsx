@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,7 +34,7 @@ const ProductScreen = () => {
 
   const addToCartHandler = () => {
     dispatch(addToCart({ ...product, qty }));
-    navigate('/cart');
+    navigate('/orders/cart');
   };
 
   const {
@@ -43,6 +43,24 @@ const ProductScreen = () => {
     refetch,
     error,
   } = useGetProductDetailsQuery(productId);
+
+  // Quando o produto carrega com stock esgotado, publica no Event Bus
+  // e persiste no localStorage para consumidores que ainda não estão montados
+  useEffect(() => {
+    if (product && product.countInStock === 0) {
+      const outOfStock = JSON.parse(localStorage.getItem('outOfStock') || '[]');
+      if (!outOfStock.find((p) => p.productId === product._id)) {
+        const updated = [...outOfStock, { productId: product._id, productName: product.name }];
+        localStorage.setItem('outOfStock', JSON.stringify(updated));
+      }
+      if (window.__eventBus) {
+        window.__eventBus.publish('stockEmpty', {
+          productId: product._id,
+          productName: product.name,
+        });
+      }
+    }
+  }, [product]);
 
   const { userInfo } = useSelector((state) => state.auth);
 
