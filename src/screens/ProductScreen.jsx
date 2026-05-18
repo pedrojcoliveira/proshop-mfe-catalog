@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Row,
   Col,
@@ -20,22 +20,16 @@ import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import Meta from '../components/Meta';
-import { addToCart } from '../slices/cartSlice';
+
+const AddToCartButton = lazy(() =>
+  import('mfeOrders/AddToCartButton').catch(() => ({ default: () => null }))
+);
 
 const ProductScreen = () => {
   const { id: productId } = useParams();
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [qty, setQty] = useState(1);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-
-  const addToCartHandler = () => {
-    dispatch(addToCart({ ...product, qty }));
-    navigate('/orders/cart');
-  };
 
   const {
     data: product,
@@ -69,13 +63,8 @@ const ProductScreen = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
     try {
-      await createReview({
-        productId,
-        rating,
-        comment,
-      }).unwrap();
+      await createReview({ productId, rating, comment }).unwrap();
       refetch();
       toast.success('Review created successfully');
     } catch (err) {
@@ -137,40 +126,10 @@ const ProductScreen = () => {
                       </Col>
                     </Row>
                   </ListGroup.Item>
-
-                  {/* Qty Select */}
-                  {product.countInStock > 0 && (
-                    <ListGroup.Item>
-                      <Row>
-                        <Col>Qty</Col>
-                        <Col>
-                          <Form.Control
-                            as='select'
-                            value={qty}
-                            onChange={(e) => setQty(Number(e.target.value))}
-                          >
-                            {[...Array(product.countInStock).keys()].map(
-                              (x) => (
-                                <option key={x + 1} value={x + 1}>
-                                  {x + 1}
-                                </option>
-                              )
-                            )}
-                          </Form.Control>
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  )}
-
                   <ListGroup.Item>
-                    <Button
-                      className='btn-block'
-                      type='button'
-                      disabled={product.countInStock === 0}
-                      onClick={addToCartHandler}
-                    >
-                      Add To Cart
-                    </Button>
+                    <Suspense fallback={<Loader />}>
+                      <AddToCartButton product={product} />
+                    </Suspense>
                   </ListGroup.Item>
                 </ListGroup>
               </Card>
@@ -191,9 +150,7 @@ const ProductScreen = () => {
                 ))}
                 <ListGroup.Item>
                   <h2>Write a Customer Review</h2>
-
                   {loadingProductReview && <Loader />}
-
                   {userInfo ? (
                     <Form onSubmit={submitHandler}>
                       <Form.Group className='my-2' controlId='rating'>
@@ -232,7 +189,7 @@ const ProductScreen = () => {
                     </Form>
                   ) : (
                     <Message>
-                      Please <Link to='/login'>sign in</Link> to write a review
+                      Please <Link to='/user/login'>sign in</Link> to write a review
                     </Message>
                   )}
                 </ListGroup.Item>
