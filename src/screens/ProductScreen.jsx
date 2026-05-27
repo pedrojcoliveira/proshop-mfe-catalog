@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import authService from 'mfeAuth/AuthService';
 import {
   Row,
   Col,
@@ -38,25 +38,16 @@ const ProductScreen = () => {
     error,
   } = useGetProductDetailsQuery(productId);
 
-  // Quando o produto carrega com stock esgotado, publica no Event Bus
-  // e persiste no localStorage para consumidores que ainda não estão montados
   useEffect(() => {
-    if (product && product.countInStock === 0) {
-      const outOfStock = JSON.parse(localStorage.getItem('outOfStock') || '[]');
-      if (!outOfStock.find((p) => p.productId === product._id)) {
-        const updated = [...outOfStock, { productId: product._id, productName: product.name }];
-        localStorage.setItem('outOfStock', JSON.stringify(updated));
-      }
-      if (window.__eventBus) {
-        window.__eventBus.publish('stockEmpty', {
-          productId: product._id,
-          productName: product.name,
-        });
-      }
+    if (product && product.countInStock === 0 && window.__eventBus) {
+      window.__eventBus.publish('stockEmpty', {
+        productId: product._id,
+        productName: product.name,
+      });
     }
   }, [product]);
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const userInfo = authService.getUser();
 
   const [createReview, { isLoading: loadingProductReview }] =
     useCreateReviewMutation();
@@ -190,7 +181,7 @@ const ProductScreen = () => {
                   ) : (
                     <Message>
                       Please <Link to='/user/login'>sign in</Link> to write a review
-                    </Message>
+e                    </Message>
                   )}
                 </ListGroup.Item>
               </ListGroup>
