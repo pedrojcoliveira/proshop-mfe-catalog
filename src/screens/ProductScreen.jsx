@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import authService from 'mfeAuth/AuthService';
@@ -37,15 +37,6 @@ const ProductScreen = () => {
     refetch,
     error,
   } = useGetProductDetailsQuery(productId);
-
-  useEffect(() => {
-    if (product && product.countInStock === 0 && window.__eventBus) {
-      window.__eventBus.publish('stockEmpty', {
-        productId: product._id,
-        productName: product.name,
-      });
-    }
-  }, [product]);
 
   const userInfo = authService.getUser();
 
