@@ -1,0 +1,7 @@
+{
+  "parserOptions": { "ecmaVersion": 2021, "sourceType": "module", "ecmaFeatures": { "jsx": true } },
+  "plugins": ["complexity"],
+  "rules": {
+    "complexity": ["warn", { "max": 1 }]
+  }
+}
